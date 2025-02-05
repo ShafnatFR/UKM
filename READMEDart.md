@@ -160,6 +160,7 @@ void bayar(int total) {
   print("-------------------------");
   print("Total Belanja: Rp$total");
   print("Terima kasih telah berbelanja!");
+  menu();
 }
 
 void topUp() {
