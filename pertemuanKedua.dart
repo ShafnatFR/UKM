@@ -27,6 +27,19 @@ class BarangMinuman extends Barang {
   }
 }
 
+abstract class Bank {
+  String nama;
+  Bank(this.nama);
+}
+
+class BankDigital extends Bank {
+  BankDigital(String nama) : super(nama);
+}
+
+class BankBiasa extends Bank {
+  BankBiasa(String nama) : super(nama);
+}
+
 List<Barang> daftarBarang = [
   BarangMakanan("Kopi", 15000),
   BarangMakanan("Roti", 10000),
@@ -35,6 +48,18 @@ List<Barang> daftarBarang = [
   BarangMakanan("Mie Instan", 3500),
   BarangMakanan("Beras 5Kg", 60000),
   BarangMinuman("Air Mineral 600ml", 3500),
+];
+
+List<BankDigital> daftarBankDigital = [
+  BankDigital("Ovo"),
+  BankDigital("Go-Pay"),
+  BankDigital("Shopee Pay"),
+];
+
+List<BankBiasa> daftarBankBiasa = [
+  BankBiasa("BCA"),
+  BankBiasa("Mandiri"),
+  BankBiasa("BRI"),
 ];
 
 List<Map<String, dynamic>> keranjang = [];
@@ -83,11 +108,9 @@ void transaksi() {
 
   int total = 0;
   while (true) {
-    int index = 1;
-    daftarBarang.forEach((barang) {
-      print("$index. ${barang.nama} - Rp${barang.harga}");
-      index++;
-    });
+    for (int i = 0; i < daftarBarang.length; i++) {
+      print("${i + 1}. ${daftarBarang[i].nama} - Rp${daftarBarang[i].harga}");
+    }
 
     stdout.write("Pilih nomor barang atau ketik 'selesai': ");
     String pilihan = stdin.readLineSync() ?? "";
@@ -130,17 +153,37 @@ void transaksi() {
 
 void bayar(int total) {
   print("\n=== STRUK BELANJA ===");
-  keranjang.forEach((item) {
+  for (var item in keranjang) {
     print("${item['jumlah']}x ${item['nama']} - Rp${item['subtotal']}");
-  });
+  }
 
   print("-------------------------");
   print("Total Belanja: Rp$total");
   print("Terima kasih telah berbelanja!");
+  menu();
 }
 
 void topUp() {
-  print("\n### TOP UP ###");
+  print("\n### PILIH JENIS BANK ###");
+  print("1. Bank Digital");
+  print("2. Bank Biasa");
+  stdout.write("Masukkan Pilihan => ");
+  String pilihan = stdin.readLineSync() ?? "";
+
+  List<Bank> daftarPilihan = pilihan == "1" ? daftarBankDigital : daftarBankBiasa;
+
+  print("\n### PILIH BANK ###");
+  for (int i = 0; i < daftarPilihan.length; i++) {
+    print("${i + 1}. ${daftarPilihan[i].nama}");
+  }
+
+  stdout.write("Masukkan Pilihan => ");
+  int? bankPilihan = int.tryParse(stdin.readLineSync() ?? "");
+  if (bankPilihan == null || bankPilihan < 1 || bankPilihan > daftarPilihan.length) {
+    print("Pilihan tidak valid!");
+    return topUp();
+  }
+
   stdout.write("Masukkan jumlah top up: ");
   int? jumlah = int.tryParse(stdin.readLineSync() ?? "");
 
@@ -149,6 +192,10 @@ void topUp() {
     return topUp();
   }
 
-  print("Top up Rp$jumlah berhasil!");
+  print("\n=== STRUK TOP UP ===");
+  print("Bank: ${daftarPilihan[bankPilihan - 1].nama}");
+  print("Jumlah: Rp$jumlah");
+  print("Top up berhasil!");
+
   menu();
 }
